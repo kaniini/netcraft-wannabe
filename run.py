@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 import requests
 import json
 import re
+import time
 app = Flask(__name__)
 
 match_pat = re.compile('^(.+)\.netcraft\.dereferenced\.org$')
@@ -13,6 +14,11 @@ def index():
     global match_pat
 
     qt = request.form['qtype']
+    if qt == 'SOA':
+        return jsonify({"qname": "netcraft.dereferenced.org", "qtype": "SOA", "ttl": 86400, "content": "kaniini.tortois.es. {} 10800".format(int(time.time()))})
+    if qt == 'NS':
+        ns_srvs = ['ns1.tortois.es', 'ns2.tortois.es', 'ns3.tortois.es']
+        return jsonify([{"qname": "netcraft.dereferenced.org", "qtype": "NS", "ttl": 86400, "content": ns_srv} for ns_srv in ns_srvs])
     if qt not in ['TXT', 'ANY']:
         return "[]"
 
